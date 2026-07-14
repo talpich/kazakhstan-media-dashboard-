@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СМИ Казахстана — рейтинг, эксперты, регионы</title>
+<style>
+  :root{
+    --kz-blue:#00a3dd;
+    --kz-blue-dark:#0072a8;
+    --kz-gold:#ffd100;
+    --bg:#f4f7fa;
+    --card:#ffffff;
+    --text:#1c2b36;
+    --muted:#5c6b76;
+    --border:#e1e8ed;
+    --danger:#c0392b;
+    --ok:#1e8449;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  header{
+    background:linear-gradient(120deg,var(--kz-blue-dark),var(--kz-blue));
+    color:#fff;
+    padding:28px 20px 22px;
+    text-align:center;
+    position:relative;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.7rem;
+    letter-spacing:.3px;
+  }
+  header p{
+    margin:0;
+    font-size:.92rem;
+    color:#e6f6ff;
+  }
+  .badge-date{
+    display:inline-block;
+    margin-top:10px;
+    background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.4);
+    border-radius:20px;
+    padding:4px 14px;
+    font-size:.8rem;
+  }
+  nav.tabs{
+    position:sticky;
+    top:0;
+    z-index:10;
+    display:flex;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    flex:1;
+    min-width:160px;
+    padding:14px 10px;
+    border:none;
+    background:transparent;
+    font-size:.95rem;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    transition:.15s;
+  }
+  nav.tabs button:hover{ color:var(--kz-blue-dark); background:#f0faff; }
+  nav.tabs button.active{
+    color:var(--kz-blue-dark);
+    border-bottom-color:var(--kz-gold);
+    background:#f0faff;
+  }
+  main{
+    max-width:1100px;
+    margin:0 auto;
+    padding:22px 16px 60px;
+  }
+  .tabpanel{ display:none; animation:fadeIn .2s ease; }
+  .tabpanel.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+
+  .search-box{
+    width:100%;
+    padding:10px 14px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:.95rem;
+    margin-bottom:16px;
+    background:#fff;
+  }
+  .search-box:focus{ outline:2px solid var(--kz-blue); }
+
+  .notice{
+    background:#fff8e1;
+    border:1px solid #ffe082;
+    border-left:4px solid var(--kz-gold);
+    border-radius:6px;
+    padding:12px 16px;
+    font-size:.87rem;
+    color:#5c4a00;
+    margin-bottom:18px;
+  }
+  .notice b{ color:#8a6d00; }
+  .notice.danger{
+    background:#fdecea;
+    border-color:#f5b7b1;
+    border-left-color:var(--danger);
+    color:#7b241c;
+  }
+  .notice.danger b{ color:var(--danger); }
+
+  h2.section-title{
+    font-size:1.25rem;
+    margin:26px 0 10px;
+    color:var(--kz-blue-dark);
+    border-bottom:2px solid var(--border);
+    padding-bottom:6px;
+  }
+  h2.section-title:first-child{ margin-top:0; }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,.06);
+    margin-bottom:8px;
+  }
+  th,td{
+    padding:10px 12px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+    font-size:.88rem;
+    vertical-align:top;
+  }
+  th{
+    background:#eaf6fc;
+    color:var(--kz-blue-dark);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  tr:last-child td{ border-bottom:none; }
+  tr:hover td{ background:#f7fcff; }
+  td.rank{
+    font-weight:700;
+    color:var(--kz-blue-dark);
+    text-align:center;
+    width:40px;
+  }
+  a{ color:var(--kz-blue-dark); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+
+  .src{ font-size:.78rem; color:var(--muted); }
+  .chip{
+    display:inline-block;
+    background:#eaf6fc;
+    color:var(--kz-blue-dark);
+    border:1px solid #cdeaf7;
+    border-radius:12px;
+    padding:2px 9px;
+    margin:2px 3px 2px 0;
+    font-size:.78rem;
+    white-space:nowrap;
+  }
+  .chip.unverified{
+    background:#f2f2f2;
+    color:var(--muted);
+    border-color:#ddd;
+    font-style:italic;
+  }
+  .region-group{ margin-bottom:22px; }
+  .region-group h3{
+    margin:0 0 8px;
+    font-size:1rem;
+    color:#fff;
+    background:var(--kz-blue-dark);
+    display:inline-block;
+    padding:4px 14px;
+    border-radius:14px;
+  }
+  .expert-cat{ margin-bottom:30px; }
+  .expert-cat h3{
+    font-size:1.08rem;
+    color:var(--text);
+    background:linear-gradient(90deg,var(--kz-gold),#fff6cc);
+    padding:6px 14px;
+    border-radius:6px;
+    display:inline-block;
+    margin:0 0 10px;
+  }
+  footer{
+    text-align:center;
+    padding:22px;
+    color:var(--muted);
+    font-size:.8rem;
+  }
+  .hidden-row{ display:none !important; }
+  .count-tag{ font-size:.8rem; color:var(--muted); margin-left:8px; font-weight:400; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>СМИ Казахстана: рейтинг, эксперты, регионы</h1>
+  <p>Сводный дашборд по казахстанским медиа — цитируемость, посещаемость, тематические эксперты и региональные издания</p>
+  <span class="badge-date">Данные собраны из открытых источников · по состоянию на 14 июля 2026</span>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="rating">📊 Рейтинг СМИ</button>
+  <button class="tab-btn" data-tab="experts">🎓 Эксперты по темам</button>
+  <button class="tab-btn" data-tab="regions">📍 Региональные СМИ</button>
+</nav>
+
+<main>
+
+  <!-- ================= TAB 1: RATING ================= -->
+  <section id="tab-rating" class="tabpanel active">
+
+    <div class="notice danger">
+      <b>Важно про честность данных:</b> полного актуального (2024–2026) публичного рейтинга казахстанских СМИ с точными местами 1–30 в открытых источниках не существует.
+      Единственная полная таблица с числовыми показателями — исследование <b>Brand Analytics, февраль 2021</b> (методология: индекс цитируемости в соцмедиа).
+      Более поздние выпуски того же исследования (2023–2025) публикуются в виде инфографики без расшифровки в текст — ниже приведены только точечные факты, которые удалось подтвердить текстом источника.
+      Рейтинги без прямого источника (в т.ч. непроверенные версии "топ-10 за 2025 год" с конкретными числами) намеренно не включены — не удалось найти первоисточник.
+    </div>
+
+    <h2 class="section-title">Топ СМИ Казахстана по индексу цитируемости в соцмедиа <span class="count-tag">Brand Analytics, февраль 2021</span></h2>
+    <table id="table-rating-main">
+      <thead>
+        <tr><th>Место</th><th>СМИ</th><th>Индекс цитируемости (ссылок/мес.)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="rank">1</td><td>Zakon.kz</td><td>150 187</td></tr>
+        <tr><td class="rank">2</td><td>Казинформ (inform.kz)</td><td>122 875</td></tr>
+        <tr><td class="rank">3</td><td>Sputnik Қазақстан</td><td>72 888</td></tr>
+        <tr><td class="rank">4</td><td>Sports.kz</td><td>63 210</td></tr>
+        <tr><td class="rank">5</td><td>Tengrinews.kz</td><td>55 232</td></tr>
+        <tr><td class="rank">6</td><td>Nur.kz</td><td>45 731</td></tr>
+        <tr><td class="rank">7</td><td>Inbusiness.kz (Atameken Business)</td><td>41 983</td></tr>
+        <tr><td class="rank">8</td><td>Lada.kz</td><td>41 602</td></tr>
+        <tr><td class="rank">9</td><td>Азаттық радиосы (azattyq.org)</td><td>18 229</td></tr>
+        <tr><td class="rank">10</td><td>Деловой Казахстан (dknews.kz)</td><td>15 340</td></tr>
+        <tr><td class="rank">21</td><td>Кызылординские вести (kzvesti.kz)</td><td>11 534</td></tr>
+      </tbody>
+    </table>
+    <p class="src">Места 11–20 и 22–30 в источнике указаны собирательным списком без точного порядка (Литер, Vesti.kz, Наша газета, КазТАГ, Время.kz и др.) — не приводим их как ранжированные, чтобы не выдумывать порядок.<br>
+    Источники: <a href="https://brandanalytics.ru/blog/top-30-media-kazakhstan" target="_blank">brandanalytics.ru</a> ·
+    <a href="https://adindex.ru/specprojects/asia/news/292060.phtml" target="_blank">adindex.ru</a> ·
+    <a href="https://www.inform.kz/ru/predstavlen-top-30-smi-kazahstana-po-citiruemosti-v-social-nyh-media_a3766127" target="_blank">inform.kz</a></p>
+
+    <h2 class="section-title">Подтверждённые точечные факты 2023–2025</h2>
+    <table>
+      <thead><tr><th>СМИ</th><th>Факт</th><th>Дата</th><th>Источник</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Tengrinews.kz</td>
+          <td>№1 по посещаемости среди казахстанских сайтов (рейтинг LiveInternet)</td>
+          <td>весна 2024</td>
+          <td><a href="https://ru.wikipedia.org/wiki/Tengrinews.kz" target="_blank">wikipedia.org</a></td>
+        </tr>
+        <tr>
+          <td>Sports.kz</td>
+          <td>Лидер топ-20 казахстанских СМИ по цитируемости в соцмедиа (Brand Analytics)</td>
+          <td>осень 2023</td>
+          <td><a href="https://tribune.kz/sotsialnye-seti-v-kazahstane-tsifry-i-trendy-osen-2023-na-kakih-yazykah-govorit-kazahstan-v-seti/" target="_blank">tribune.kz</a></td>
+        </tr>
+        <tr>
+          <td>24.kz</td>
+          <td>Опустился с 11-й на 20-ю позицию в топ-20 по цитируемости</td>
+          <td>лето 2024</td>
+          <td><a href="https://tribune.kz/sotsialnye-seti-v-kazahstane-tsifry-i-trendy-leto-2024-na-kakih-yazykah-govorit-kazahstan-v-seti/" target="_blank">tribune.kz</a></td>
+        </tr>
+        <tr>
+          <td>Петропавловск.news</td>
+          <td>Самое цитируемое региональное СМИ РК, вошло в топ-10 среди всех СМИ, 6-е место среди республиканских изданий</td>
+          <td>август 2025</td>
+          <td><a href="https://pkzsk.info/petropavlovsk-news-stalo-samym-citiruemym-regionalnym-smi-v-kazakhstane-po-issledovaniyu-brand-analytics-v-avguste-2025-goda/" target="_blank">pkzsk.info</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Живой источник посещаемости: LiveInternet</h2>
+    <p>Рейтинг сайтов Казахстана по посещаемости обновляется ежедневно — цифры не хардкодятся на этом сайте, смотрите актуальные значения напрямую:
+    <a href="https://www.liveinternet.ru/rating/#geo=kz" target="_blank">liveinternet.ru/rating/#geo=kz</a> (нужен ручной просмотр в браузере — страница строится через JS и категории "СМИ/новости" фильтруются вручную).</p>
+
+    <h2 class="section-title">Источники, которые проверялись, но НЕ дали публичного рейтинга с местами</h2>
+    <table>
+      <thead><tr><th>Источник</th><th>Результат проверки</th></tr></thead>
+      <tbody>
+        <tr><td>Ranking.kz</td><td>Публикует аналитику о медиасфере, но не ведёт собственный рейтинг СМИ по цитируемости/посещаемости</td></tr>
+        <tr><td>Комитет информации МИОР РК</td><td>Официального публичного рейтинга СМИ не обнаружено</td></tr>
+        <tr><td>PR News Kazakhstan</td><td>Профильного рейтинга СМИ не обнаружено</td></tr>
+        <tr><td>Медиалогия (mlg.ru)</td><td>Ведёт рейтинги СМИ, но только для России — Казахстан не входит</td></tr>
+        <tr><td>ZERO.kz</td><td>Каталог казахстанских сайтов существует, но таблица с местами требует интерактивного просмотра</td></tr>
+        <tr><td>JagaJam</td><td>Даёт рейтинг по соцсетям конкретных изданий, частично платный доступ</td></tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- ================= TAB 2: EXPERTS ================= -->
+  <section id="tab-experts" class="tabpanel">
+
+    <div class="notice">
+      <b>Про достоверность:</b> имена и факты биографии подтверждены через СМИ и публичные источники (ссылки указаны).
+      Там, где не удалось напрямую подтвердить username/ссылку на аккаунт, стоит пометка <span class="chip unverified">не подтверждён</span> — перед публикацией такие ссылки стоит проверить вручную.
+      Число подписчиков и активность каналов могли измениться с момента сбора данных.
+    </div>
+
+    <input type="text" id="expertSearch" class="search-box" placeholder="🔍 Поиск эксперта или темы...">
+
+    <div class="expert-cat" data-cat="Инвестиции">
+      <h3>💰 Инвестиции / фондовый рынок (KASE)</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Андрей Чеботарёв</td><td>Независимый финансовый аналитик, экс-аналитик EXANTE в Казахстане</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/FINANCEkaz" target="_blank">@FINANCEkaz</a></span></td>
+            <td class="src"><a href="https://esquire.kz/7-kazahstanskih-telegram-kanalov-o-finansah-na-kotorye-nuzhno-podpisatsja-prjamo-sejchas" target="_blank">esquire.kz</a>, <a href="https://kapital.kz/expert/andrey-chebotarev" target="_blank">kapital.kz</a></td></tr>
+          <tr><td>Маргулан Сейсембай</td><td>Управляющий партнёр Asadel Partners / Asadel Venture, основатель Margulan.info</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/s/MargulanSeissembai" target="_blank">@MargulanSeissembai</a> (~226К)</span></td>
+            <td class="src"><a href="https://margulan.info/pages/invest-club" target="_blank">margulan.info</a></td></tr>
+          <tr><td>Мурат Кастаев</td><td>Генеральный директор DAMU Capital Management (M&amp;A, инвестконсалтинг)</td>
+            <td><span class="chip">LinkedIn: <a href="https://www.linkedin.com/in/muratkastayev/" target="_blank">muratkastayev</a></span></td>
+            <td class="src"><a href="https://kapital.kz/expert/murat-kastayev" target="_blank">kapital.kz</a>, <a href="https://forbes.kz/articles/kakoy-bank-mogut-kupit-v-2026-godu-0fdbe6" target="_blank">forbes.kz</a></td></tr>
+          <tr><td>Гульнар Амиргали</td><td>Финансовый эксперт (20 лет в корп. финансах), основатель инвестклуба Utic</td>
+            <td><span class="chip">Instagram: <a href="https://www.instagram.com/utic.kz/" target="_blank">@utic.kz</a></span></td>
+            <td class="src"><a href="https://weproject.media/articles/detail/finansy-i-investitsii-5-blogerov-s-auditoriey-kotoraya-khochet-uvelichit-svoi-dokhody/" target="_blank">weproject.media</a></td></tr>
+          <tr><td>Даур Иманмадиров</td><td>Инвестиционный блогер, делится опытом построения портфеля (акции, облигации)</td>
+            <td><span class="chip">Threads: <a href="https://www.threads.com/@daur.imanmadirov/" target="_blank">@daur.imanmadirov</a></span></td>
+            <td class="src"><a href="https://bank.kz/wikibank/finansy/kak-investirovat-i-ne-poteryat-dengi/" target="_blank">bank.kz</a></td></tr>
+          <tr><td>Алибек Жалгаспаев</td><td>Блогер/коуч по инвестициям (Aligee Investor). <b style="color:var(--danger)">Есть жалобы на отсутствие лицензии и негативные отзывы о курсах</b> — указывать с осторожностью</td>
+            <td><span class="chip">Instagram: <a href="https://www.instagram.com/aligee_investor/" target="_blank">@aligee_investor</a></span></td>
+            <td class="src">критика: <a href="https://cryptorussia.ru/investudy-academy-kz-akademiya" target="_blank">cryptorussia.ru</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="expert-cat" data-cat="Госзакупки">
+      <h3>📑 Государственные закупки (тендеры, госзаказ)</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Хасен Жапаров</td><td>Эксперт-практик по госзакупкам (10+ лет, 1+ млрд тг выигранных закупок), основатель Inside Business</td>
+            <td><span class="chip unverified">Instagram: @inside__business (не подтверждён напрямую)</span></td>
+            <td class="src"><a href="https://inside-b.kz/obuchenie-uslugi-zakupki-caspy-tender" target="_blank">inside-b.kz</a></td></tr>
+          <tr><td>Нуржамал Макулбекова</td><td>Юрист по государственным закупкам, привлекается как внешний эксперт</td>
+            <td><span class="chip unverified">аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://www.bcc.kz/bcc-journal/government-and-business-tenders/" target="_blank">bcc.kz</a></td></tr>
+        </tbody>
+      </table>
+      <p class="src">Направление слабо представлено персональными медийными экспертами — контент чаще ведётся от имени образовательных платформ (Instagram-каналы @tenderbotkz, @zakupki.kz), а не конкретных публичных персон.</p>
+    </div>
+
+    <div class="expert-cat" data-cat="Макроэкономика">
+      <h3>📈 Макроэкономика / экономика Казахстана</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Олжас Тулеуов</td><td>Экономист, экс-управляющий директор AERC, экс-советник председателя Нацбанка РК</td>
+            <td><span class="chip unverified">атрибуция канала TENGENOMIKA спорная</span></td>
+            <td class="src"><a href="https://www.inform.kz/ru/ekonomist-olzhas-tuleuov-naznachen-sovetnikom-glavy-nacbanka_a3691664" target="_blank">inform.kz</a></td></tr>
+          <tr><td>Галымжан Айтказин</td><td>Экономист, колумнист Forbes Kazakhstan, связан с каналом TENGENOMIKA</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/tengenomika" target="_blank">@tengenomika</a></span></td>
+            <td class="src"><a href="https://esquire.kz/7-kazahstanskih-telegram-kanalov-o-finansah-na-kotorye-nuzhno-podpisatsja-prjamo-sejchas" target="_blank">esquire.kz</a></td></tr>
+          <tr><td>Расул Рысмамбетов</td><td>Финансист, председатель правления "NAC Analytica", директор фонда "Финансовая свобода", колумнист Forbes Kazakhstan</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/financeview" target="_blank">@financeview</a></span> <span class="chip">Facebook: <a href="https://www.facebook.com/rassul.rysmambetov" target="_blank">rassul.rysmambetov</a></span></td>
+            <td class="src"><a href="https://ulysmedia.kz/interview/11852-ia-finansist-a-ne-sviashchennik-rasul-rysmambetov-znaet-kogda-kazakhstan-budet-zazhitochnym/" target="_blank">ulysmedia.kz</a></td></tr>
+          <tr><td>Арман Батаев</td><td>Финансовый консультант (ACCA), соавтор проекта Finmentor.kz</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/finmentorkz" target="_blank">@finmentorkz</a></span></td>
+            <td class="src"><a href="https://the-steppe.com/lyudi/finmentor-kz-kak-proekt-po-finansovoy-gramotnosti-pomogaet-upravlyat-lichnym-kapitalom" target="_blank">the-steppe.com</a></td></tr>
+          <tr><td>Айдос Телжан и Куаныш Шонбай</td><td>Основатели Rumi Group, ведут канал о бизнесе и экономике РК</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/qazaqbiznes" target="_blank">@qazaqbiznes</a></span></td>
+            <td class="src"><a href="https://esquire.kz/7-kazahstanskih-telegram-kanalov-o-finansah-na-kotorye-nuzhno-podpisatsja-prjamo-sejchas" target="_blank">esquire.kz</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="expert-cat" data-cat="IT">
+      <h3>💻 IT и технологии Казахстана</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Есен Ниязов</td><td>Соучредитель и CEO Peaksoft, техноблогер (контекст ЦА)</td>
+            <td><span class="chip">Instagram: <a href="https://www.instagram.com/" target="_blank">@eniiazov</a></span></td>
+            <td class="src"><a href="https://the-tech.kz/12-tehnoblogerov-iz-czentralnoj-azii/" target="_blank">the-tech.kz</a></td></tr>
+          <tr><td>Беназир</td><td>Первая в Казахстане сертифицированная Apple преподаватель Swift, iOS-разработчик</td>
+            <td><span class="chip">Instagram: <a href="https://www.instagram.com/" target="_blank">@benaziration</a></span></td>
+            <td class="src"><a href="https://the-tech.kz/12-tehnoblogerov-iz-czentralnoj-azii/" target="_blank">the-tech.kz</a></td></tr>
+          <tr><td>Айболат Кулатай</td><td>Ведёт блог об IT на казахском языке</td>
+            <td><span class="chip">Instagram: <a href="https://www.instagram.com/" target="_blank">@aibolat.kulatay</a></span></td>
+            <td class="src"><a href="https://the-tech.kz/12-tehnoblogerov-iz-czentralnoj-azii/" target="_blank">the-tech.kz</a></td></tr>
+          <tr><td>Александр Дауранов</td><td>Главный аналитик альянса QazTech, эксперт по цифровой экономике и Big Data</td>
+            <td><span class="chip unverified">аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://er10.kz/read/podborki/pro-erten-20-aleksandr-dauranov-pro-big-data-e-commerce-i-glavnye-trendy/" target="_blank">er10.kz</a></td></tr>
+          <tr><td>Еркебулан Сапаров</td><td>Основатель Product Masters, спикер Astana Hub</td>
+            <td><span class="chip unverified">аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://astanahub.com/ru/" target="_blank">astanahub.com</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="expert-cat" data-cat="Недвижимость">
+      <h3>🏠 Недвижимость Казахстана</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Александр Бикетов</td><td>Риелтор-аналитик высшей категории (SARK №00689), Nelina.kz&amp;Partners</td>
+            <td><span class="chip">Профиль: <a href="https://www.kn.kz/realtor/23547" target="_blank">kn.kz</a></span></td>
+            <td class="src"><a href="https://krisha.kz/content/articles/2025/2025-otkuda-takie-ceny-eksperty-rasskazali-kak-rabotaet-rynok-nedvizhimosti" target="_blank">krisha.kz</a></td></tr>
+          <tr><td>Диляра Сейтнурова</td><td>Девелопер, эксперт по строительству и реновации, эксперт Qazaq Expert Club</td>
+            <td><span class="chip unverified">аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://kz.kursiv.media/2026-06-22/zhnb-developer-rasskazala-stoit-li-uzhe-brat-kvartiru-ili-podozhdat-vozmozhnogo-snizheniya-czen/" target="_blank">kz.kursiv.media</a></td></tr>
+          <tr><td>Руслан Тельтаев</td><td>Частный риелтор в Алматы и Астане, 10+ лет на рынке</td>
+            <td><span class="chip">Facebook: <a href="https://www.facebook.com/Teltaev.kz/" target="_blank">Teltaev.kz</a></span></td>
+            <td class="src"><a href="https://teltaev.kz/" target="_blank">teltaev.kz</a></td></tr>
+        </tbody>
+      </table>
+      <p class="src">Направление слабее всего представлено персональными блогерами — большинство контента идёт от изданий (Krisha.kz, Kursiv.media) с цитированием разных экспертов.</p>
+    </div>
+
+    <div class="expert-cat" data-cat="Банки">
+      <h3>🏦 Банковский сектор / финансы</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Айдар Алибаев</td><td>Экономист, экс-глава Ассоциации пенсионных фондов РК (1997–2014), глава НГО "Союз потребителей финансовых услуг"</td>
+            <td><span class="chip unverified">аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://kapital.kz/expert/aidar-alibaev" target="_blank">kapital.kz</a></td></tr>
+          <tr><td>Расул Рысмамбетов</td><td>Регулярно комментирует банковский сектор, ипотеку, пенсионную систему (см. также раздел "Макроэкономика")</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/financeview" target="_blank">@financeview</a></span></td>
+            <td class="src"><a href="https://kz.kursiv.media/2026-06-03/kaye-pochemu-kazahstanczy-ne-chuvstvuyut-rost-ekonomiki-obyasnil-rysmambetov/" target="_blank">kz.kursiv.media</a></td></tr>
+          <tr><td>Мурат Кастаев</td><td>Комментирует банковский сектор РК, сделки M&amp;A с банками (см. также "Инвестиции")</td>
+            <td><span class="chip">LinkedIn: <a href="https://www.linkedin.com/in/muratkastayev/" target="_blank">muratkastayev</a></span></td>
+            <td class="src"><a href="https://forbes.kz/articles/kakoy-bank-mogut-kupit-v-2026-godu-0fdbe6" target="_blank">forbes.kz</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="expert-cat" data-cat="Нефтегаз">
+      <h3>🛢️ Нефтегазовая отрасль Казахстана</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Абзал Нарымбетов</td><td>Нефтегазовый аналитик, оценщик запасов (SPE PRMS), директор Energy Analytics, 18+ лет в отрасли</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/EnergyAnalytics" target="_blank">@EnergyAnalytics</a></span> <span class="chip">Instagram: <a href="https://www.instagram.com/energy_analytics/" target="_blank">@energy_analytics</a></span></td>
+            <td class="src"><a href="https://globuc.com/speakers/abzal-narymbetov/" target="_blank">globuc.com</a></td></tr>
+          <tr><td>Нурлан Жумагулов</td><td>Исполнительный директор фонда Energy Monitor, комментирует проекты КазМунайГаз и цены на топливо</td>
+            <td><span class="chip unverified">Telegram канал Energy Monitor (юзернейм не подтверждён)</span></td>
+            <td class="src"><a href="https://emf.kz/" target="_blank">emf.kz</a></td></tr>
+          <tr><td>Аскар Исмаилов</td><td>Основатель PACE Analytics, советник по ЦА Global Gas Centre (Тенгиз, Карачаганак, Кашаган)</td>
+            <td><span class="chip">LinkedIn: <a href="https://kz.linkedin.com/in/askarisma" target="_blank">askarisma</a></span></td>
+            <td class="src"><a href="https://forbes.kz/articles/s-kem-kazahstanu-prodolzhat-razrabatyvat-tengiz-karachaganak-i-kashagan-020794" target="_blank">forbes.kz</a></td></tr>
+          <tr><td>Асет Наурызбаев</td><td>Экономист и инженер-энергетик, экс-глава KEGOC, публичный оппонент строительства АЭС в РК</td>
+            <td><span class="chip unverified">аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://zonakz.net/tag/aset-nauryzbaev/" target="_blank">zonakz.net</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="expert-cat" data-cat="Политика">
+      <h3>🏛️ Политика / госуправление Казахстана</h3>
+      <table>
+        <thead><tr><th>Имя</th><th>Описание</th><th>Соцсети</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td>Досым Сатпаев</td><td>Политолог, директор "Группы оценки рисков", один из самых цитируемых политологов РК</td>
+            <td><span class="chip">Facebook: <a href="https://www.facebook.com/dosyms/" target="_blank">dosyms</a></span> <span class="chip">X: <a href="https://x.com/dosymsatpayev" target="_blank">@DosymSatpayev</a></span></td>
+            <td class="src">проверено напрямую</td></tr>
+          <tr><td>Ербол Едилов</td><td>Политолог, управляющий директор GR Consulting Group, экс-советник акима Мангистауской обл. и Премьер-министра РК</td>
+            <td><span class="chip">Telegram: <a href="https://t.me/yyedilov" target="_blank">@yyedilov</a> (~46К)</span> <span class="chip">LinkedIn: <a href="https://www.linkedin.com/in/yerbol-yedilov-47993524/" target="_blank">yerbol-yedilov</a></span></td>
+            <td class="src"><a href="https://tengrinews.kz/article/telegram-politika-erbol-edilov-talgat-kaliev-naznacheniyah-884/" target="_blank">tengrinews.kz</a></td></tr>
+          <tr><td>Ерлан Карин</td><td>Политолог, государственный советник Президента РК</td>
+            <td><span class="chip unverified">личный канал упоминается, но не подтверждён</span></td>
+            <td class="src"><a href="https://www.inform.kz/ru/erlan-karin-nazval-informacionnym-virusom-publikacii-ryada-telegram-kanalov_a3638898" target="_blank">inform.kz</a></td></tr>
+          <tr><td>Талгат Калиев</td><td>Политолог, экс-автор крупного Telegram-канала (107К), ныне директор РГУ "Служба центральных коммуникаций" — канал передан третьим лицам</td>
+            <td><span class="chip unverified">канал передан, личный аккаунт не подтверждён</span></td>
+            <td class="src"><a href="https://www.nur.kz/politics/kazakhstan/1820191-krupnejsij-politiceskij-telegram-kanal-rk-peresel-v-upravlenie-tretim-licam/" target="_blank">nur.kz</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ================= TAB 3: REGIONS ================= -->
+  <section id="tab-regions" class="tabpanel">
+
+    <div class="notice">
+      Список собран из официальных сайтов, страницы Wikipedia «Телеканалы Казахстана» (сеть областных филиалов АО «РТРК Казахстан») и прямых поисковых проверок доменов.
+      Общенациональные агрегаторы (Tengrinews, Zakon.kz и т.п.) не включены — здесь только СМИ, привязанные к конкретному региону.
+    </div>
+
+    <input type="text" id="regionSearch" class="search-box" placeholder="🔍 Поиск региона или СМИ...">
+
+    <div id="regions-container"></div>
+  </section>
+
+</main>
+
+<footer>
+  Сайт собран автоматически на основе открытых источников · данные требуют периодической проверки актуальности
+</footer>
+
+<script>
+// ---------------- TABS ----------------
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------------- EXPERTS SEARCH ----------------
+document.getElementById('expertSearch').addEventListener('input',e=>{
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('#tab-experts .expert-cat').forEach(cat=>{
+    let catMatch = cat.dataset.cat.toLowerCase().includes(q);
+    let anyRowVisible = false;
+    cat.querySelectorAll('tbody tr').forEach(row=>{
+      const text = row.textContent.toLowerCase();
+      const match = q === '' || catMatch || text.includes(q);
+      row.style.display = match ? '' : 'none';
+      if(match) anyRowVisible = true;
+    });
+    cat.style.display = (q==='' || anyRowVisible) ? '' : 'none';
+  });
+});
+
+// ---------------- REGIONAL MEDIA DATA ----------------
+const regions = [
+  {region:"Алматы (город)", items:[
+    ["Almaty.tv","ТВ/сайт","https://almaty.tv/"],
+    ["Vlast.kz","сайт (аналит. журнал)","https://vlast.kz/"],
+    ["Orda.kz","сайт","https://orda.kz/"],
+    ["Informburo.kz","сайт","https://informburo.kz/"],
+    ["Tengrinews.kz","сайт","https://tengrinews.kz/"],
+  ]},
+  {region:"Астана (город)", items:[
+    ["inAstana.kz","сайт","https://www.inastana.kz/"],
+    ["BaigeNews.kz","сайт","https://rus.baq.kz/"],
+  ]},
+  {region:"Шымкент (город)", items:[
+    ["OTYRAR.kz","сайт","https://otyrar.kz/"],
+    ["inShymkent.kz","сайт","https://www.inshymkent.kz/"],
+    ["Vera.kz","сайт","https://vera.kz/"],
+    ["Телеканал OŃTÚSTIK (РТРК Казахстан)","ТВ","https://shymkenttv.kz/kz/online"],
+  ]},
+  {region:"Абайская область (Семей)", items:[
+    ["ABAI NEWS","сайт","https://abai-news.kz/"],
+    ["Semey News","сайт","https://semeynews.kz/"],
+    ["Semey Ainasy","сайт","https://semeyainasy.media/"],
+    ["Телеканал SEMEI (РТРК Казахстан)","ТВ","https://semeitv.kz/ru/"],
+    ["«Семей таңы» / Вести Семей","газета/сайт","https://vestisemey.kz/"],
+  ]},
+  {region:"Акмолинская область (Кокшетау)", items:[
+    ["Кокшетау Сегодня","сайт","https://kokshetoday.kz/"],
+    ["Акмолинская правда","газета/сайт","https://apgazeta.kz/"],
+    ["Akmol Inform","сайт","https://akmolinform.kz/"],
+    ["Aqmola News","сайт","https://aqmolanews.kz/ru/"],
+    ["Телеканал KÓKSHE (РТРК Казахстан)","ТВ","https://kokshetautv.kz/kz"],
+  ]},
+  {region:"Актюбинская область (Актобе)", items:[
+    ["Актюбинский вестник","газета/сайт","https://avestnik.kz/"],
+    ["Диапазон","газета/сайт","https://diapazon.kz/"],
+    ["Aktobe Times","сайт","https://aktobetimes.kz/"],
+    ["AktobeINFO","сайт","https://aktobeinfo.kz/"],
+    ["Телеканал AQTOBE (РТРК Казахстан)","ТВ","https://aktobetv.kz/kz"],
+  ]},
+  {region:"Алматинская область (Талдыкорган)", items:[
+    ["Огни Алатау","газета/сайт","https://ognialatau.kz/"],
+    ["TINFO","сайт","https://www.tinfo.kz/"],
+    ["taldyk.info","сайт","https://taldyk.info/"],
+  ]},
+  {region:"Атырауская область (Атырау)", items:[
+    ["Ак Жайык","газета/сайт","https://azh.kz/ru"],
+    ["AtyrauPress","сайт","https://atpress.kz/ru/"],
+    ["inAtyrau.kz","сайт","https://www.inatyrau.kz/"],
+    ["Телеканал ATYRAÝ (РТРК Казахстан)","ТВ","https://atyrautv.kz/kz"],
+  ]},
+  {region:"Восточно-Казахстанская область (Усть-Каменогорск)", items:[
+    ["Устинка Live","сайт","https://ustinka.kz/"],
+    ["YK-news.kz","сайт","https://yk-news.kz/"],
+    ["YK.KZ","сайт","https://yk.kz/"],
+    ["Noks.kz","сайт","https://noks.kz/"],
+    ["Телеканал ALTAI (РТРК Казахстан)","ТВ","https://oskementv.kz/kz"],
+  ]},
+  {region:"Жамбылская область (Тараз)", items:[
+    ["Жамбыл-Тараз","газета/сайт","https://ztgzt.kz/"],
+    ["Телеканал JAMBYL (РТРК Казахстан)","ТВ","https://taraztv.kz/kz"],
+  ]},
+  {region:"Жетысуская область (Талдыкорган)", items:[
+    ["Вестник Жетісу","газета/сайт","https://vestnik19.kz/"],
+    ["Телеканал «Жетісу»","ТВ","https://zhetysutv.kz/ru/"],
+    ["TINFO","сайт","https://www.tinfo.kz/"],
+  ]},
+  {region:"Западно-Казахстанская область (Уральск)", items:[
+    ["Жайық Пресс","сайт","https://zhaikpress.kz/ru/"],
+    ["Уральская Неделя","газета/сайт","https://www.uralskweek.kz/"],
+    ["Мой ГОРОД","сайт","https://mgorod.kz/"],
+    ["Телеканал AQJAIYQ (РТРК Казахстан)","ТВ","https://oraltv.kz/kz"],
+  ]},
+  {region:"Карагандинская область (Караганда)", items:[
+    ["Новый Вестник","газета/сайт","https://nv.kz/"],
+    ["Караганда Онлайн","сайт","https://ekaraganda.kz/"],
+    ["Индустриальная Караганда","сайт","https://inkaraganda.kz/"],
+    ["Телеканал SARYARQA (РТРК Казахстан)","ТВ","https://kartv.kz/kz/online"],
+  ]},
+  {region:"Костанайская область (Костанай)", items:[
+    ["Костанайские Новости","газета/сайт","https://kstnews.kz/"],
+    ["Наша Газета","газета/сайт","https://ng.kz/"],
+    ["Наш Костанай","газета/сайт","https://top-news.kz/"],
+    ["Телеканал QOSTANAI (РТРК Казахстан)","ТВ","https://kostanaytv.kz/kz"],
+  ]},
+  {region:"Кызылординская область (Кызылорда)", items:[
+    ["Kyzylorda-News.kz","сайт","https://kyzylorda-news.kz/ru"],
+    ["Кызылординские Вести","газета/сайт","https://kzvesti.kz/"],
+    ["Телеканал QYZYLORDA (РТРК Казахстан)","ТВ","https://kyzylordatv.kz/kz"],
+  ]},
+  {region:"Мангистауская область (Актау)", items:[
+    ["ЛАДА.kz","сайт","https://www.lada.kz/"],
+    ["Мангистау Медиа","сайт","https://mangystaumedia.kz/ru"],
+    ["inAktau.kz","сайт","https://www.inaktau.kz/"],
+    ["Телеканал MAŃǴYSTAÝ (РТРК Казахстан)","ТВ","https://mangystautv.kz/ru"],
+  ]},
+  {region:"Павлодарская область (Павлодар)", items:[
+    ["PavlodarNews.kz","сайт","https://pavlodarnews.kz/ru"],
+    ["Pavlodar Online (Pavon.kz)","сайт","https://pavon.kz/"],
+    ["Наша жизнь (lifepvl.kz)","газета/сайт","https://lifepvl.kz/"],
+    ["Irbis TV","ТВ","https://irbistv.kz/"],
+    ["Телеканал ERTIS (РТРК Казахстан)","ТВ","https://pavlodartv.kz/kz"],
+  ]},
+  {region:"Северо-Казахстанская область (Петропавловск)", items:[
+    ["Petropavlovsk.news (pkzsk.info)","сайт","https://pkzsk.info/"],
+    ["7152.kz","сайт","https://www.7152.kz/"],
+    ["SocialMedia (sm1.kz)","сайт","https://sm1.kz/"],
+    ["МТРК","ТВ/сайт","https://mtrk.kz/ru/"],
+    ["Телеканал QYZYLJAR (РТРК Казахстан)","ТВ","https://qyzyljartv.kz/ru"],
+  ]},
+  {region:"Туркестанская область (Туркестан)", items:[
+    ["Turkistan Today","сайт","https://ru.turkistan.today/"],
+    ["Vera.kz («Жизнь на юге»)","сайт","https://vera.kz/category/zhizn-na-yuge/"],
+    ["OTYRAR.kz","сайт","https://otyrar.kz/"],
+  ]},
+  {region:"Улытауская область (Жезказган/Сатпаев)", items:[
+    ["Шарайна (Sharayna)","газета/сайт","https://sharayna.kz/"],
+    ["Kazlenta.kz (раздел Ulytau)","сайт","https://kazlenta.kz/ulytau/"],
+  ]},
+];
+
+const regionsContainer = document.getElementById('regions-container');
+regions.forEach(r=>{
+  const div = document.createElement('div');
+  div.className = 'region-group';
+  div.dataset.region = r.region.toLowerCase();
+  let rows = r.items.map(([name,type,url])=>`
+    <tr><td>${name}</td><td>${type}</td><td><a href="${url}" target="_blank">${url.replace(/^https?:\/\//,'').replace(/\/$/,'')}</a></td></tr>
+  `).join('');
+  div.innerHTML = `
+    <h3>${r.region}</h3>
+    <table>
+      <thead><tr><th>Название СМИ</th><th>Тип</th><th>Сайт</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+  regionsContainer.appendChild(div);
+});
+
+document.getElementById('regionSearch').addEventListener('input',e=>{
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.region-group').forEach(group=>{
+    const regionMatch = group.dataset.region.includes(q);
+    let anyRow = false;
+    group.querySelectorAll('tbody tr').forEach(row=>{
+      const match = q==='' || regionMatch || row.textContent.toLowerCase().includes(q);
+      row.style.display = match ? '' : 'none';
+      if(match) anyRow = true;
+    });
+    group.style.display = (q==='' || anyRow) ? '' : 'none';
+  });
+});
+</script>
+
+</body>
+</html>
