@@ -67,6 +67,10 @@
     flex:1;
     min-width:150px;
     padding:16px 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
     border:none;
     background:transparent;
     font-size:.9rem;
@@ -81,6 +85,11 @@
     color:var(--blue);
     border-bottom-color:var(--blue);
     font-weight:600;
+  }
+  .tab-icon{
+    width:16px;
+    height:16px;
+    flex-shrink:0;
   }
   main{
     max-width:960px;
@@ -210,9 +219,9 @@
 </header>
 
 <nav class="tabs">
-  <button class="tab-btn active" data-tab="rating">📊 Рейтинг СМИ</button>
-  <button class="tab-btn" data-tab="experts">🎓 Эксперты по темам</button>
-  <button class="tab-btn" data-tab="regions">📍 Региональные СМИ</button>
+  <button class="tab-btn active" data-tab="rating"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>Рейтинг СМИ</button>
+  <button class="tab-btn" data-tab="experts"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path></svg>Эксперты по темам</button>
+  <button class="tab-btn" data-tab="regions"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Региональные СМИ</button>
 </nav>
 
 <main>
